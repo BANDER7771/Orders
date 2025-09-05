@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لوحة إدارة طلبات التشاليح (محلي)</title>
+  <style>
+    :root{--bg:#f6f7f9;--card:#fff;--ink:#111;--muted:#6b7280;--brand:#111;--ring:rgba(0,0,0,.08);--ok:#059669;--warn:#b45309;--bad:#b91c1c}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cairo,Noto Sans,Arial}
+    .container{max-width:1200px;margin-inline:auto;padding:16px}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.03)}
+    .row{display:flex;gap:12px;align-items:center}
+    .btn{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .btn.danger{background:#fff;color:var(--bad);border-color:#fecaca}
+    .btn.warn{background:#fff;color:var(--warn);border-color:#fcd34d}
+    .input,.select,.textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:9px 12px;outline:none}
+    .input:focus,.select:focus,.textarea:focus{box-shadow:0 0 0 4px var(--ring)}
+    .grid{display:grid;gap:12px}
+    .grid2{grid-template-columns:1fr 1fr}
+    .grid3{grid-template-columns:repeat(3,1fr)}
+    .grid4{grid-template-columns:repeat(4,1fr)}
+    .sticky{position:sticky;top:0;background:rgba(255,255,255,.75);backdrop-filter:saturate(180%) blur(10px);z-index:5;border-bottom:1px solid #e5e7eb}
+    .stat{padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid #e5e7eb;font-size:13px;color:#374151;padding:10px}
+    tbody td{border-bottom:1px solid #f1f5f9;padding:10px;vertical-align:top}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .pill.new{background:#dbeafe;color:#1d4ed8}
+    .pill.progress{background:#ffedd5;color:#b45309}
+    .pill.wait{background:#ede9fe;color:#6d28d9}
+    .pill.done{background:#dcfce7;color:#065f46}
+    .pill.cancel{background:#fee2e2;color:#991b1b}
+    .muted{color:var(--muted)}
+    .right{margin-inline-start:auto}
+    .toolbar{padding:10px}
+    dialog{border:none;border-radius:16px;max-width:900px;width:96%;padding:0;box-shadow:0 15px 60px rgba(0,0,0,.2)}
+    dialog::backdrop{background:rgba(0,0,0,.35)}
+    .modal-head{padding:14px 16px;border-bottom:1px solid #e5e7eb}
+    .modal-body{padding:16px}
+    .modal-foot{padding:12px 16px;border-top:1px solid #e5e7eb}
+    .kpi{font-size:22px;font-weight:800}
+    .nowrap{white-space:nowrap}
+    .link{color:#2563eb;text-decoration:underline}
+    .tag{background:#f3f4f6;color:#111;padding:3px 8px;border-radius:10px;font-size:11px}
+  </style>
+</head>
+<body>
+  <header class="sticky">
+    <div class="container row" style="justify-content:space-between">
+      <div>
+        <div class="row" style="gap:8px"><strong>لوحة إدارة طلبات التشاليح</strong><span class="tag">نسخة محلية – بدون خادم</span></div>
+        <div class="muted" style="font-size:12px">استقبال الطلبات يدويًا، تعديل الملاحظات ورابط الموقع لكل طلب، بحث/تصفية، وتصدير/استيراد. كل البيانات تُحفظ في المتصفح (localStorage).</div>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="addBtn">+ طلب جديد</button>
+        <button class="btn" id="exportCsvBtn">تصدير CSV</button>
+        <button class="btn" id="backupBtn">نسخة JSON</button>
+        <button class="btn" id="importBtn">استيراد</button>
+        <input type="file" id="fileInput" accept="application/json" style="display:none" />
+        <button class="btn danger" id="bulkDeleteBtn">حذف الجماعي</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="display:grid;gap:16px">
+    <!-- إحصائيات -->
+    <section class="grid grid4">
+      <div class="stat"><div class="muted">إجمالي الطلبات</div><div class="kpi" id="kpiTotal">0</div></div>
+      <div class="stat"><div class="muted">قيد التنفيذ</div><div class="kpi" id="kpiProg">0</div></div>
+      <div class="stat"><div class="muted">مكتملة</div><div class="kpi" id="kpiDone">0</div></div>
+      <div class="stat"><div class="muted">الربح (ر.س)</div><div class="kpi" id="kpiProfit">0</div></div>
+    </section>
+
+    <!-- أدوات التصفية -->
+    <section class="card toolbar grid grid4">
+      <input class="input" id="q" placeholder="بحث بالاسم/الهاتف/السيارة/المدينة/القطع…" />
+      <select class="select" id="statusFilter"></select>
+      <select class="select" id="urgencyFilter"></select>
+      <div class="row"><button class="btn primary" id="quickAdd">إضافة سريعة</button><button class="btn right" id="clearFilters">تفريغ</button></div>
+    </section>
+
+    <!-- الجدول -->
+    <section class="card" style="overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="checkAll" /></th>
+            <th>رقم</th>
+            <th>العميل</th>
+            <th>جوال</th>
+            <th>السيارة</th>
+            <th>الأولوية</th>
+            <th>الحالة</th>
+            <th>السعر</th>
+            <th>الربح</th>
+            <th>ملاحظات</th>
+            <th>موقع/رابط</th>
+            <th>عمليات</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <p class="muted" style="font-size:12px">تلميح: الضغط على رقم الجوال يفتح رسالة واتساب جاهزة. يمكنك تعديل "الملاحظات" و"الموقع" مباشرة من الجدول، كل تغيير يُحفَظ تلقائيًا.</p>
+  </main>
+
+  <!-- نافذة الطلب -->
+  <dialog id="orderDlg">
+    <form method="dialog" id="orderForm">
+      <div class="modal-head row" style="justify-content:space-between">
+        <strong id="dlgTitle">إضافة طلب</strong>
+        <button class="btn" value="cancel">إغلاق</button>
+      </div>
+      <div class="modal-body grid grid2">
+        <label>رقم الطلب
+          <input class="input" id="f_code" />
+        </label>
+        <label>مصدر الطلب
+          <input class="input" id="f_source" placeholder="واتساب / اتصال / متجر"/>
+        </label>
+        <label>اسم العميل
+          <input class="input" id="f_customer" />
+        </label>
+        <label>جوال
+          <input class="input" id="f_phone" />
+        </label>
+        <label>المدينة
+          <input class="input" id="f_city" value="تبوك" />
+        </label>
+        <label>رابط الموقع (اختياري)
+          <input class="input" id="f_site" placeholder="https://example.com/item"/>
+        </label>
+        <label>ماركة السيارة
+          <input class="input" id="f_brand" />
+        </label>
+        <label>الموديل
+          <input class="input" id="f_model" />
+        </label>
+        <label>سنة الصنع
+          <input class="input" id="f_year" />
+        </label>
+        <label>الأولوية
+          <select class="select" id="f_urgency"></select>
+        </label>
+        <label>الحالة
+          <select class="select" id="f_status"></select>
+        </label>
+        <label>مكلّف به
+          <input class="input" id="f_assigned" />
+        </label>
+        <label>التكلفة (علينا)
+          <input class="input" id="f_cost" type="number" step="0.01" />
+        </label>
+        <label>السعر للعميل
+          <input class="input" id="f_price" type="number" step="0.01" />
+        </label>
+        <label class="grid" style="grid-column:1/-1">القطع المطلوبة
+          <textarea class="textarea" id="f_parts" rows="3"></textarea>
+        </label>
+        <label class="grid" style="grid-column:1/-1">ملاحظات
+          <textarea class="textarea" id="f_notes" rows="3"></textarea>
+        </label>
+      </div>
+      <div class="modal-foot row" style="justify-content:end">
+        <button class="btn" value="cancel">إلغاء</button>
+        <button class="btn primary" id="saveBtn" value="default">حفظ</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const STATUSES=[
+      {key:'new',label:'جديد',cls:'pill new'},
+      {key:'in_progress',label:'قيد التنفيذ',cls:'pill progress'},
+      {key:'awaiting_client',label:'بانتظار العميل',cls:'pill wait'},
+      {key:'done',label:'مكتمل',cls:'pill done'},
+      {key:'cancelled',label:'ملغي',cls:'pill cancel'},
+    ];
+    const URGENCY=[
+      {key:'instant',label:'فوري'},
+      {key:'fast',label:'سريع'},
+      {key:'normal',label:'عادي'},
+    ];
+    const LS_KEY='orders_v2';
+
+    const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
+    const state={orders:load(), editId:null};
+
+    function uid(){return Math.random().toString(36).slice(2,9)}
+    function now(){return new Date().toISOString()}
+    function load(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):[]}catch(e){return []}}
+    function save(){localStorage.setItem(LS_KEY,JSON.stringify(state.orders))}
+
+    function waLink(o){
+      const phone=(o.phone||'').replace(/[^\d]/g,'');
+      const msg=`طلبك رقم: ${o.code}\nالاسم: ${o.customerName}\nالسيارة: ${o.carBrand} ${o.carModel} ${o.carYear}\nالقطع: ${o.parts}\nالأولوية: ${URGENCY.find(u=>u.key===o.urgency)?.label||''}\nالحالة الحالية: ${STATUSES.find(s=>s.key===o.status)?.label||''}`
+      return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+    }
+
+    function fmtMoney(n){n=Number(n)||0;return n.toLocaleString('ar-SA',{maximumFractionDigits:2})}
+
+    function renderFilters(){
+      const sF=$('#statusFilter'), uF=$('#urgencyFilter');
+      sF.innerHTML='<option value="all">كل الحالات</option>'+STATUSES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+      uF.innerHTML='<option value="all">كل الأولويات</option>'+URGENCY.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+    }
+
+    function render(){
+      const q=($('#q').value||'').toLowerCase();
+      const sf=$('#statusFilter').value, uf=$('#urgencyFilter').value;
+      const rows=state.orders.filter(o=>{
+        const hay=[o.code,o.customerName,o.phone,o.city,o.carBrand,o.carModel,o.carYear,o.parts,o.notes,o.assignedTo,o.source,o.site].join(' ').toLowerCase();
+        const hitQ= q==='' || hay.includes(q);
+        const hitS= sf==='all' || o.status===sf; const hitU= uf==='all' || o.urgency===uf;
+        return hitQ && hitS && hitU;
+      });
+
+      const tbody=$('#tbody'); tbody.innerHTML='';
+      rows.forEach(o=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td><input type="checkbox" class="rowCheck" data-id="${o.id}"/></td>
+          <td class="nowrap"><strong>${o.code}</strong><div class="muted" style="font-size:11px">${new Date(o.createdAt).toLocaleString('ar-SA')}</div></td>
+          <td>
+            <div style="font-weight:700">${o.customerName||'—'}</div>
+            <div class="muted" style="font-size:12px">${o.city||''}</div>
+          </td>
+          <td><a class="link" href="${waLink(o)}" target="_blank" rel="noreferrer">${o.phone||'—'}</a></td>
+          <td>${o.carBrand||''} ${o.carModel||''} ${o.carYear||''}</td>
+          <td><span class="tag">${URGENCY.find(u=>u.key===o.urgency)?.label||''}</span></td>
+          <td><span class="${STATUSES.find(s=>s.key===o.status)?.cls}">${STATUSES.find(s=>s.key===o.status)?.label||''}</span></td>
+          <td>${fmtMoney(o.price)} ر.س</td>
+          <td>${fmtMoney(o.profit)} ر.س</td>
+          <td>
+            <div contenteditable data-field="notes" data-id="${o.id}" class="card" style="padding:6px;min-width:160px;max-width:260px;outline:none">${(o.notes||'').replace(/</g,'&lt;')}</div>
+          </td>
+          <td>
+            <input class="input" data-field="site" data-id="${o.id}" value="${o.site||''}" placeholder="https://example.com" />
+          </td>
+          <td>
+            <div class="row" style="flex-wrap:wrap;gap:6px">
+              <button class="btn" data-act="edit" data-id="${o.id}">تعديل</button>
+              <button class="btn danger" data-act="del" data-id="${o.id}">حذف</button>
+              <select class="select" data-act="status" data-id="${o.id}">
+                ${STATUSES.map(s=>`<option value="${s.key}" ${o.status===s.key?'selected':''}>${s.label}</option>`).join('')}
+              </select>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+
+      // KPI
+      $('#kpiTotal').textContent=state.orders.length;
+      $('#kpiProg').textContent=state.orders.filter(o=>o.status==='in_progress').length;
+      $('#kpiDone').textContent=state.orders.filter(o=>o.status==='done').length;
+      $('#kpiProfit').textContent=fmtMoney(state.orders.reduce((s,o)=>s+(Number(o.profit)||0),0));
+
+      // row events
+      tbody.querySelectorAll('[data-act="edit"]').forEach(b=>b.onclick=()=>openEdit(b.dataset.id));
+      tbody.querySelectorAll('[data-act="del"]').forEach(b=>b.onclick=()=>del(b.dataset.id));
+      tbody.querySelectorAll('[data-act="status"]').forEach(sel=>sel.onchange=(e)=>{
+        const id=sel.dataset.id;const v=e.target.value;upd(id,{status:v});
+      });
+      tbody.querySelectorAll('[data-field="site"]').forEach(inp=>inp.onchange=(e)=>{upd(inp.dataset.id,{site:e.target.value})});
+      tbody.querySelectorAll('[data-field="notes"]').forEach(div=>{
+        div.addEventListener('blur',()=>{upd(div.dataset.id,{notes:div.innerText})});
+      });
+
+      // master checkbox
+      $('#checkAll').checked=false;
+    }
+
+    function add(o){state.orders=[{id:uid(),...o},...state.orders];save();render()}
+    function upd(id,patch){state.orders=state.orders.map(x=>x.id===id?{...x,...patch,updatedAt:now()}:x);save();render()}
+    function del(id){if(confirm('حذف الطلب؟')){state.orders=state.orders.filter(x=>x.id!==id);save();render()}}
+
+    function openNew(){state.editId=null; $('#dlgTitle').textContent='إضافة طلب'; fillForm(defaultOrder()); $('#orderDlg').showModal()}
+    function openEdit(id){state.editId=id; const o=state.orders.find(x=>x.id===id); $('#dlgTitle').textContent='تعديل الطلب'; fillForm(o); $('#orderDlg').showModal()}
+
+    function defaultOrder(){
+      const code='F'+Date.now().toString().slice(-6);
+      return {code,customerName:'',phone:'',city:'تبوك',source:'واتساب',carBrand:'',carModel:'',carYear:'',parts:'',notes:'',site:'',urgency:'normal',status:'new',assignedTo:'',cost:0,price:0,profit:0,createdAt:now(),updatedAt:now()}
+    }
+
+    function fillForm(o){
+      $('#f_code').value=o.code||'';$('#f_source').value=o.source||'';$('#f_customer').value=o.customerName||'';$('#f_phone').value=o.phone||'';$('#f_city').value=o.city||'';$('#f_site').value=o.site||'';$('#f_brand').value=o.carBrand||'';$('#f_model').value=o.carModel||'';$('#f_year').value=o.carYear||'';$('#f_parts').value=o.parts||'';$('#f_notes').value=o.notes||'';$('#f_assigned').value=o.assignedTo||'';$('#f_cost').value=o.cost||0;$('#f_price').value=o.price||0;
+      // selects
+      $('#f_urgency').innerHTML=URGENCY.map(u=>`<option value="${u.key}">${u.label}</option>`).join('');
+      $('#f_status').innerHTML=STATUSES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+      $('#f_urgency').value=o.urgency||'normal';$('#f_status').value=o.status||'new';
+    }
+
+    function serializeForm(){
+      const cost=Number($('#f_cost').value)||0;const price=Number($('#f_price').value)||0;
+      return {code:$('#f_code').value.trim(),source:$('#f_source').value.trim(),customerName:$('#f_customer').value.trim(),phone:$('#f_phone').value.trim(),city:$('#f_city').value.trim(),site:$('#f_site').value.trim(),carBrand:$('#f_brand').value.trim(),carModel:$('#f_model').value.trim(),carYear:$('#f_year').value.trim(),parts:$('#f_parts').value.trim(),notes:$('#f_notes').value.trim(),urgency:$('#f_urgency').value,status:$('#f_status').value,assignedTo:$('#f_assigned').value.trim(),cost,price,profit:price-cost,updatedAt:now(),createdAt: state.editId? state.orders.find(x=>x.id===state.editId).createdAt: now()};
+    }
+
+    // Events
+    $('#addBtn').onclick=openNew;
+    $('#quickAdd').onclick=()=>{const o=defaultOrder();o.customerName='بدون اسم'; add(o)}
+    $('#clearFilters').onclick=()=>{$('#q').value='';$('#statusFilter').value='all';$('#urgencyFilter').value='all';render()}
+
+    $('#orderForm').addEventListener('close',()=>{})
+    $('#saveBtn').onclick=(e)=>{e.preventDefault();const data=serializeForm(); if(state.editId){upd(state.editId,data)} else {add(data)}; $('#orderDlg').close()}
+
+    // search / filters reactive
+    $('#q').oninput=render; $('#statusFilter').onchange=render; $('#urgencyFilter').onchange=render;
+
+    // Bulk delete
+    $('#bulkDeleteBtn').onclick=()=>{
+      const ids=[...$$('.rowCheck:checked')].map(x=>x.dataset.id);
+      if(ids.length===0) return alert('اختر صفوفًا أولاً');
+      if(confirm('هل تريد حذف العناصر المحددة؟')){state.orders=state.orders.filter(o=>!ids.includes(o.id));save();render()}
+    }
+    $('#checkAll').onchange=(e)=>{$$('.rowCheck').forEach(c=>c.checked=e.target.checked)}
+
+    // Export CSV
+    $('#exportCsvBtn').onclick=()=>{
+      const headers=["id","code","customerName","phone","city","source","site","carBrand","carModel","carYear","parts","notes","urgency","status","assignedTo","cost","price","profit","createdAt","updatedAt"];
+      const rows=state.orders.map(o=>headers.map(h=> (o[h]??'').toString().replace(/\"/g,'""') ));
+      const csv=[headers.join(','),...rows.map(r=>r.map(x=>`"${x}"`).join(','))].join('\n');
+      const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='orders.csv';a.click();
+    }
+
+    // Backup / Import JSON
+    $('#backupBtn').onclick=()=>{const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify(state.orders,null,2));a.download='orders-backup.json';a.click()}
+    $('#importBtn').onclick=()=>$('#fileInput').click();
+    $('#fileInput').onchange=(e)=>{const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{try{const data=JSON.parse(r.result); if(Array.isArray(data)){state.orders=data; save(); render()} else alert('ملف غير صالح');}catch(err){alert('فشل قراءة الملف')}}; r.readAsText(f)}
+
+    renderFilters(); render();
+  </script>
+</body>
+</html>
