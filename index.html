@@ -3,55 +3,71 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>لوحة إدارة طلبات التشاليح (محلي)</title>
+  <title>لوحة إدارة طلبات التشاليح</title>
+  <meta name="color-scheme" content="light dark">
   <style>
-    :root{--bg:#f6f7f9;--card:#fff;--ink:#111;--muted:#6b7280;--brand:#111;--ring:rgba(0,0,0,.08);--ok:#059669;--warn:#b45309;--bad:#b91c1c}
-    *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cairo,Noto Sans,Arial}
+    :root{--bg:#f6f7f9;--card:#fff;--ink:#0f172a;--muted:#64748b;--ring:rgba(15,23,42,.08)}
+    *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cairo,Arial}
     .container{max-width:1200px;margin-inline:auto;padding:16px}
-    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.03)}
-    .row{display:flex;gap:12px;align-items:center}
-    .btn{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer}
-    .btn[disabled]{opacity:.5;cursor:not-allowed}
-    .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
-    .btn.danger{background:#fff;color:var(--bad);border-color:#fecaca}
-    .btn.warn{background:#fff;color:var(--warn);border-color:#fcd34d}
-    .input,.select,.textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:9px 12px;outline:none}
+    .row{display:flex;gap:10px;align-items:center}
+    .right{margin-inline-start:auto}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 8px 40px rgba(15,23,42,.04)}
+    .toolbar{padding:10px}
+    .btn{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .btn.primary{background:#111827;color:#fff;border-color:#111827}
+    .btn.bad{color:#b91c1c;border-color:#fecaca;background:#fff}
+    .btn.warn{color:#b45309;border-color:#fde68a;background:#fff}
+    .btn.ghost{background:transparent}
+    .input,.select,.textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;outline:none}
     .input:focus,.select:focus,.textarea:focus{box-shadow:0 0 0 4px var(--ring)}
     .grid{display:grid;gap:12px}
     .grid2{grid-template-columns:1fr 1fr}
     .grid3{grid-template-columns:repeat(3,1fr)}
     .grid4{grid-template-columns:repeat(4,1fr)}
-    .sticky{position:sticky;top:0;background:rgba(255,255,255,.75);backdrop-filter:saturate(180%) blur(10px);z-index:5;border-bottom:1px solid #e5e7eb}
-    .stat{padding:14px;border:1px solid #e5e7eb;border-radius:14px;background:#fff}
+    .sticky{position:sticky;top:0;background:rgba(255,255,255,.7);backdrop-filter:saturate(160%) blur(10px);z-index:8;border-bottom:1px solid #e5e7eb}
     table{width:100%;border-collapse:separate;border-spacing:0}
-    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid #e5e7eb;font-size:13px;color:#374151;padding:10px}
-    tbody td{border-bottom:1px solid #f1f5f9;padding:10px;vertical-align:top}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
-    .pill.new{background:#dbeafe;color:#1d4ed8}
-    .pill.progress{background:#ffedd5;color:#b45309}
-    .pill.wait{background:#ede9fe;color:#6d28d9}
-    .pill.done{background:#dcfce7;color:#065f46}
-    .pill.cancel{background:#fee2e2;color:#991b1b}
-    .muted{color:var(--muted)}
-    .right{margin-inline-start:auto}
-    .toolbar{padding:10px}
+    thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid #e5e7eb;font-size:13px;color:#334155;padding:10px}
+    tbody td{border-bottom:1px solid #eef2f7;padding:10px;vertical-align:top}
+    .tag{display:inline-block;background:#f1f5f9;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800}
+    .s-new{background:#dbeafe;color:#1d4ed8}
+    .s-review{background:#fde68a;color:#a16207}
+    .s-search{background:#ffedd5;color:#b45309}
+    .s-quote{background:#ede9fe;color:#6d28d9}
+    .s-done{background:#dcfce7;color:#065f46}
+    .s-arch{background:#e5e7eb;color:#374151}
+    .s-cancel{background:#fee2e2;color:#991b1b}
+    .muted{color:#64748b}
     dialog{border:none;border-radius:16px;max-width:900px;width:96%;padding:0;box-shadow:0 15px 60px rgba(0,0,0,.2)}
     dialog::backdrop{background:rgba(0,0,0,.35)}
     .modal-head{padding:14px 16px;border-bottom:1px solid #e5e7eb}
     .modal-body{padding:16px}
     .modal-foot{padding:12px 16px;border-top:1px solid #e5e7eb}
-    .kpi{font-size:22px;font-weight:800}
+    .kpi{font-size:22px;font-weight:900}
     .nowrap{white-space:nowrap}
     .link{color:#2563eb;text-decoration:underline}
-    .tag{background:#f3f4f6;color:#111;padding:3px 8px;border-radius:10px;font-size:11px}
+    .lock{min-height:100dvh;display:grid;place-items:center;background:linear-gradient(135deg,#f8fafc,#eef2ff)}
   </style>
 </head>
 <body>
+  <div id="lock" class="lock" hidden>
+    <form class="card" style="width:min(92vw,420px);padding:22px" id="lockForm">
+      <h1 style="margin:0 0 6px;font-size:22px">لوحة الإدارة</h1>
+      <div class="muted" style="font-size:13px;margin-bottom:14px">أدخل كلمة المرور</div>
+      <input id="lockPass" type="password" class="input" placeholder="••••••" />
+      <div class="row" style="margin-top:10px;justify-content:space-between">
+        <button type="submit" class="btn primary">دخول</button>
+        <button type="button" class="btn" id="changePassBtn">تغيير كلمة المرور</button>
+      </div>
+      <div id="lockErr" class="muted" style="margin-top:8px;color:#b91c1c"></div>
+    </form>
+  </div>
+
   <header class="sticky">
     <div class="container row" style="justify-content:space-between">
       <div>
-        <div class="row" style="gap:8px"><strong>لوحة إدارة طلبات التشاليح</strong><span class="tag">نسخة محلية – بدون خادم</span></div>
-        <div class="muted" style="font-size:12px">استقبال الطلبات يدويًا، تعديل الملاحظات ورابط الموقع لكل طلب، بحث/تصفية، وتصدير/استيراد. كل البيانات تُحفظ في المتصفح (localStorage).</div>
+        <div class="row" style="gap:8px"><strong>لوحة إدارة الطلبات</strong><span class="tag">نسخة مؤقتة — تخزين محلي الآن، وقابلة للربط بـ Airtable لاحقًا</span></div>
+        <div class="muted" style="font-size:12px">إضافة/مراجعة/بحث/تصفية، حالات واضحة، واتساب بنقرة. لاحقًا نربط بصفحة الاستقبال + Airtable.</div>
       </div>
       <div class="row">
         <button class="btn primary" id="addBtn">+ طلب جديد</button>
@@ -59,7 +75,8 @@
         <button class="btn" id="backupBtn">نسخة JSON</button>
         <button class="btn" id="importBtn">استيراد</button>
         <input type="file" id="fileInput" accept="application/json" style="display:none" />
-        <button class="btn danger" id="bulkDeleteBtn">حذف الجماعي</button>
+        <button class="btn" id="lockBtn">قفل</button>
+        <button class="btn warn" id="changePassBtnTop">تغيير الباسورد</button>
       </div>
     </div>
   </header>
@@ -67,10 +84,10 @@
   <main class="container" style="display:grid;gap:16px">
     <!-- إحصائيات -->
     <section class="grid grid4">
-      <div class="stat"><div class="muted">إجمالي الطلبات</div><div class="kpi" id="kpiTotal">0</div></div>
-      <div class="stat"><div class="muted">قيد التنفيذ</div><div class="kpi" id="kpiProg">0</div></div>
-      <div class="stat"><div class="muted">مكتملة</div><div class="kpi" id="kpiDone">0</div></div>
-      <div class="stat"><div class="muted">الربح (ر.س)</div><div class="kpi" id="kpiProfit">0</div></div>
+      <div class="card" style="padding:14px"><div class="muted">إجمالي الطلبات</div><div class="kpi" id="kpiTotal">0</div></div>
+      <div class="card" style="padding:14px"><div class="muted">نشِطة (غير مؤرشفة/ملغية)</div><div class="kpi" id="kpiActive">0</div></div>
+      <div class="card" style="padding:14px"><div class="muted">مكتملة</div><div class="kpi" id="kpiDone">0</div></div>
+      <div class="card" style="padding:14px"><div class="muted">الربح الصافي (ر.س)</div><div class="kpi" id="kpiProfit">0</div></div>
     </section>
 
     <!-- أدوات التصفية -->
@@ -86,7 +103,7 @@
       <table>
         <thead>
           <tr>
-            <th><input type="checkbox" id="checkAll" /></th>
+            <th></th>
             <th>رقم</th>
             <th>العميل</th>
             <th>جوال</th>
@@ -104,7 +121,9 @@
       </table>
     </section>
 
-    <p class="muted" style="font-size:12px">تلميح: الضغط على رقم الجوال يفتح رسالة واتساب جاهزة. يمكنك تعديل "الملاحظات" و"الموقع" مباشرة من الجدول، كل تغيير يُحفَظ تلقائيًا.</p>
+    <p class="muted" style="font-size:12px">تلميح: اضغط على رقم الجوال لفتح واتساب مع رسالة جاهزة. 
+      الحالة الافتراضية لأي طلب جديد هي <strong>جديد</strong>، ويمكن تحويله إلى <strong>تحت المراجعة</strong> → <strong>جاري البحث</strong> → <strong>تم إرسال عرض</strong> → <strong>مكتمل</strong> → <strong>أرشيف</strong>.
+    </p>
   </main>
 
   <!-- نافذة الطلب -->
@@ -115,54 +134,22 @@
         <button class="btn" value="cancel">إغلاق</button>
       </div>
       <div class="modal-body grid grid2">
-        <label>رقم الطلب
-          <input class="input" id="f_code" />
-        </label>
-        <label>مصدر الطلب
-          <input class="input" id="f_source" placeholder="واتساب / اتصال / متجر"/>
-        </label>
-        <label>اسم العميل
-          <input class="input" id="f_customer" />
-        </label>
-        <label>جوال
-          <input class="input" id="f_phone" />
-        </label>
-        <label>المدينة
-          <input class="input" id="f_city" value="تبوك" />
-        </label>
-        <label>رابط الموقع (اختياري)
-          <input class="input" id="f_site" placeholder="https://example.com/item"/>
-        </label>
-        <label>ماركة السيارة
-          <input class="input" id="f_brand" />
-        </label>
-        <label>الموديل
-          <input class="input" id="f_model" />
-        </label>
-        <label>سنة الصنع
-          <input class="input" id="f_year" />
-        </label>
-        <label>الأولوية
-          <select class="select" id="f_urgency"></select>
-        </label>
-        <label>الحالة
-          <select class="select" id="f_status"></select>
-        </label>
-        <label>مكلّف به
-          <input class="input" id="f_assigned" />
-        </label>
-        <label>التكلفة (علينا)
-          <input class="input" id="f_cost" type="number" step="0.01" />
-        </label>
-        <label>السعر للعميل
-          <input class="input" id="f_price" type="number" step="0.01" />
-        </label>
-        <label class="grid" style="grid-column:1/-1">القطع المطلوبة
-          <textarea class="textarea" id="f_parts" rows="3"></textarea>
-        </label>
-        <label class="grid" style="grid-column:1/-1">ملاحظات
-          <textarea class="textarea" id="f_notes" rows="3"></textarea>
-        </label>
+        <label>رقم الطلب<input class="input" id="f_code" /></label>
+        <label>مصدر الطلب<input class="input" id="f_source" placeholder="واتساب / اتصال / متجر"/></label>
+        <label>اسم العميل<input class="input" id="f_customer" /></label>
+        <label>جوال<input class="input" id="f_phone" /></label>
+        <label>المدينة<input class="input" id="f_city" value="تبوك" /></label>
+        <label>رابط الموقع<input class="input" id="f_site" placeholder="https://example.com/item"/></label>
+        <label>ماركة السيارة<input class="input" id="f_brand" /></label>
+        <label>الموديل<input class="input" id="f_model" /></label>
+        <label>سنة الصنع<input class="input" id="f_year" /></label>
+        <label>الأولوية<select class="select" id="f_urgency"></select></label>
+        <label>الحالة<select class="select" id="f_status"></select></label>
+        <label>مكلّف به<input class="input" id="f_assigned" /></label>
+        <label>التكلفة (علينا)<input class="input" id="f_cost" type="number" step="0.01" /></label>
+        <label>السعر للعميل<input class="input" id="f_price" type="number" step="0.01" /></label>
+        <label class="grid" style="grid-column:1/-1">القطع المطلوبة<textarea class="textarea" id="f_parts" rows="3"></textarea></label>
+        <label class="grid" style="grid-column:1/-1">ملاحظات<textarea class="textarea" id="f_notes" rows="3"></textarea></label>
       </div>
       <div class="modal-foot row" style="justify-content:end">
         <button class="btn" value="cancel">إلغاء</button>
@@ -172,47 +159,88 @@
   </dialog>
 
   <script>
-    const STATUSES=[
-      {key:'new',label:'جديد',cls:'pill new'},
-      {key:'in_progress',label:'قيد التنفيذ',cls:'pill progress'},
-      {key:'awaiting_client',label:'بانتظار العميل',cls:'pill wait'},
-      {key:'done',label:'مكتمل',cls:'pill done'},
-      {key:'cancelled',label:'ملغي',cls:'pill cancel'},
+    // ======= الإعدادات العامة (مؤقت: تخزين محلي) =======
+    const STATUS = [
+      {key:'new', label:'جديد', cls:'pill s-new'},
+      {key:'review', label:'تحت المراجعة', cls:'pill s-review'},
+      {key:'search', label:'جاري البحث', cls:'pill s-search'},
+      {key:'quote', label:'تم إرسال عرض', cls:'pill s-quote'},
+      {key:'done', label:'مكتمل', cls:'pill s-done'},
+      {key:'archived', label:'أرشيف', cls:'pill s-arch'},
+      {key:'cancelled', label:'ملغي', cls:'pill s-cancel'},
     ];
     const URGENCY=[
       {key:'instant',label:'فوري'},
       {key:'fast',label:'سريع'},
       {key:'normal',label:'عادي'},
     ];
-    const LS_KEY='orders_v2';
 
-    const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
-    const state={orders:load(), editId:null};
+    const LS_KEY='orders_admin_v3';
+    const PASS_KEY='orders_admin_pass';
+    const SESSION_KEY='orders_admin_session';
 
-    function uid(){return Math.random().toString(36).slice(2,9)}
-    function now(){return new Date().toISOString()}
-    function load(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):[]}catch(e){return []}}
-    function save(){localStorage.setItem(LS_KEY,JSON.stringify(state.orders))}
+    const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
+    const state={orders:loadOrders(), editId:null};
 
+    // ======= قفل بكلمة مرور (محلي وبسيط) =======
+    function hash(s){ return btoa(unescape(encodeURIComponent(s||''))) }
+    function showLock(){ $('#lock').hidden=false; }
+    function hideLock(){ $('#lock').hidden=true; }
+
+    function ensurePassword(){
+      const has=localStorage.getItem(PASS_KEY);
+      if(!has){
+        const first=prompt('عيّن كلمة مرور للوحة (تُحفظ محليًا):');
+        if(first && first.length>=4){ localStorage.setItem(PASS_KEY, hash(first)); sessionStorage.setItem(SESSION_KEY,'ok'); hideLock(); }
+        else { alert('لن يُفتح بدون تعيين كلمة مرور. أعد تحميل الصفحة لتعيينها.'); showLock(); }
+      } else {
+        if(sessionStorage.getItem(SESSION_KEY)==='ok') hideLock(); else showLock();
+      }
+    }
+
+    $('#lockForm')?.addEventListener('submit',(e)=>{
+      e.preventDefault(); const p=$('#lockPass').value||''; const ok= localStorage.getItem(PASS_KEY)===hash(p);
+      if(ok){ sessionStorage.setItem(SESSION_KEY,'ok'); hideLock(); } else { $('#lockErr').textContent='كلمة مرور غير صحيحة'; }
+    });
+    $('#changePassBtn')?.addEventListener('click',changePass);
+    $('#changePassBtnTop')?.addEventListener('click',changePass);
+    function changePass(){ const p=prompt('أدخل كلمة المرور الجديدة (4 أحرف على الأقل):'); if(p && p.length>=4){ localStorage.setItem(PASS_KEY,hash(p)); alert('تم تغيير كلمة المرور'); } }
+    $('#lockBtn')?.addEventListener('click',()=>{ sessionStorage.removeItem(SESSION_KEY); showLock(); });
+
+    // ======= أوامر البيانات (محلي الآن) =======
+    function uid(){ return Math.random().toString(36).slice(2,9) }
+    function now(){ return new Date().toISOString() }
+    function loadOrders(){ try{ const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):[] }catch(e){ return [] } }
+    function saveOrders(){ localStorage.setItem(LS_KEY, JSON.stringify(state.orders)) }
+
+    function defaultOrder(){
+      const code='F'+Date.now().toString().slice(-6);
+      return { id:uid(), code, source:'واتساب', customerName:'', phone:'', city:'تبوك', site:'', carBrand:'', carModel:'', carYear:'', parts:'', notes:'', urgency:'normal', status:'new', assignedTo:'', cost:0, price:0, profit:0, createdAt:now(), updatedAt:now() };
+    }
+
+    function addOrder(o){ state.orders=[o,...state.orders]; saveOrders(); render(); }
+    function updateOrder(id,patch){ state.orders=state.orders.map(x=>x.id===id?{...x,...patch,updatedAt:now()}:x); saveOrders(); render(); }
+    function removeOrder(id){ if(confirm('حذف الطلب؟')){ state.orders=state.orders.filter(x=>x.id!==id); saveOrders(); render(); } }
+
+    // ======= واتساب =======
     function waLink(o){
       const phone=(o.phone||'').replace(/[^\d]/g,'');
-      const msg=`طلبك رقم: ${o.code}\nالاسم: ${o.customerName}\nالسيارة: ${o.carBrand} ${o.carModel} ${o.carYear}\nالقطع: ${o.parts}\nالأولوية: ${URGENCY.find(u=>u.key===o.urgency)?.label||''}\nالحالة الحالية: ${STATUSES.find(s=>s.key===o.status)?.label||''}`
+      const msg=`طلبك رقم: ${o.code}\nالاسم: ${o.customerName}\nالسيارة: ${o.carBrand} ${o.carModel} ${o.carYear}\nالقطع: ${o.parts}\nالأولوية: ${URGENCY.find(u=>u.key===o.urgency)?.label||''}\nالحالة: ${STATUS.find(s=>s.key===o.status)?.label||''}`
       return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
     }
 
-    function fmtMoney(n){n=Number(n)||0;return n.toLocaleString('ar-SA',{maximumFractionDigits:2})}
-
-    function renderFilters(){
-      const sF=$('#statusFilter'), uF=$('#urgencyFilter');
-      sF.innerHTML='<option value="all">كل الحالات</option>'+STATUSES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
-      uF.innerHTML='<option value="all">كل الأولويات</option>'+URGENCY.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+    // ======= الواجهة =======
+    const statusFilter=$('#statusFilter'); const urgencyFilter=$('#urgencyFilter'); const qInput=$('#q');
+    function fillFilters(){
+      statusFilter.innerHTML='<option value="all">كل الحالات</option>'+STATUS.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+      urgencyFilter.innerHTML='<option value="all">كل الأولويات</option>'+URGENCY.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
     }
 
     function render(){
-      const q=($('#q').value||'').toLowerCase();
-      const sf=$('#statusFilter').value, uf=$('#urgencyFilter').value;
+      const q=(qInput.value||'').toLowerCase();
+      const sf=statusFilter.value, uf=urgencyFilter.value;
       const rows=state.orders.filter(o=>{
-        const hay=[o.code,o.customerName,o.phone,o.city,o.carBrand,o.carModel,o.carYear,o.parts,o.notes,o.assignedTo,o.source,o.site].join(' ').toLowerCase();
+        const hay=[o.code,o.customerName,o.phone,o.city,o.site,o.carBrand,o.carModel,o.carYear,o.parts,o.notes,o.assignedTo].join(' ').toLowerCase();
         const hitQ= q==='' || hay.includes(q);
         const hitS= sf==='all' || o.status===sf; const hitU= uf==='all' || o.urgency===uf;
         return hitQ && hitS && hitU;
@@ -222,115 +250,98 @@
       rows.forEach(o=>{
         const tr=document.createElement('tr');
         tr.innerHTML=`
-          <td><input type="checkbox" class="rowCheck" data-id="${o.id}"/></td>
+          <td style="width:6px"><span class="pill ${STATUS.find(s=>s.key===o.status)?.cls}">${STATUS.find(s=>s.key===o.status)?.label}</span></td>
           <td class="nowrap"><strong>${o.code}</strong><div class="muted" style="font-size:11px">${new Date(o.createdAt).toLocaleString('ar-SA')}</div></td>
-          <td>
-            <div style="font-weight:700">${o.customerName||'—'}</div>
-            <div class="muted" style="font-size:12px">${o.city||''}</div>
-          </td>
+          <td><div style="font-weight:800">${o.customerName||'—'}</div><div class="muted" style="font-size:12px">${o.city||''}</div></td>
           <td><a class="link" href="${waLink(o)}" target="_blank" rel="noreferrer">${o.phone||'—'}</a></td>
           <td>${o.carBrand||''} ${o.carModel||''} ${o.carYear||''}</td>
           <td><span class="tag">${URGENCY.find(u=>u.key===o.urgency)?.label||''}</span></td>
-          <td><span class="${STATUSES.find(s=>s.key===o.status)?.cls}">${STATUSES.find(s=>s.key===o.status)?.label||''}</span></td>
-          <td>${fmtMoney(o.price)} ر.س</td>
-          <td>${fmtMoney(o.profit)} ر.س</td>
+          <td>
+            <select class="select" data-act="status" data-id="${o.id}">
+              ${STATUS.map(s=>`<option value="${s.key}" ${o.status===s.key?'selected':''}>${s.label}</option>`).join('')}
+            </select>
+          </td>
+          <td><input class="input" type="number" step="0.01" data-field="price" data-id="${o.id}" value="${o.price||0}" /></td>
+          <td><input class="input" type="number" step="0.01" data-field="profit" data-id="${o.id}" value="${o.profit||0}" /></td>
           <td>
             <div contenteditable data-field="notes" data-id="${o.id}" class="card" style="padding:6px;min-width:160px;max-width:260px;outline:none">${(o.notes||'').replace(/</g,'&lt;')}</div>
           </td>
-          <td>
-            <input class="input" data-field="site" data-id="${o.id}" value="${o.site||''}" placeholder="https://example.com" />
-          </td>
+          <td><input class="input" data-field="site" data-id="${o.id}" value="${o.site||''}" placeholder="https://…" /></td>
           <td>
             <div class="row" style="flex-wrap:wrap;gap:6px">
               <button class="btn" data-act="edit" data-id="${o.id}">تعديل</button>
-              <button class="btn danger" data-act="del" data-id="${o.id}">حذف</button>
-              <select class="select" data-act="status" data-id="${o.id}">
-                ${STATUSES.map(s=>`<option value="${s.key}" ${o.status===s.key?'selected':''}>${s.label}</option>`).join('')}
-              </select>
+              <button class="btn bad" data-act="del" data-id="${o.id}">حذف</button>
             </div>
           </td>`;
         tbody.appendChild(tr);
       });
 
       // KPI
+      const active=state.orders.filter(o=>!['archived','cancelled'].includes(o.status));
+      const profit=state.orders.reduce((s,o)=>s+(Number(o.profit)||0),0);
+      const doneCount=state.orders.filter(o=>o.status==='done' || o.status==='archived').length;
       $('#kpiTotal').textContent=state.orders.length;
-      $('#kpiProg').textContent=state.orders.filter(o=>o.status==='in_progress').length;
-      $('#kpiDone').textContent=state.orders.filter(o=>o.status==='done').length;
-      $('#kpiProfit').textContent=fmtMoney(state.orders.reduce((s,o)=>s+(Number(o.profit)||0),0));
+      $('#kpiActive').textContent=active.length;
+      $('#kpiDone').textContent=doneCount;
+      $('#kpiProfit').textContent=(Math.round(profit*100)/100).toLocaleString('ar-SA');
 
-      // row events
-      tbody.querySelectorAll('[data-act="edit"]').forEach(b=>b.onclick=()=>openEdit(b.dataset.id));
-      tbody.querySelectorAll('[data-act="del"]').forEach(b=>b.onclick=()=>del(b.dataset.id));
-      tbody.querySelectorAll('[data-act="status"]').forEach(sel=>sel.onchange=(e)=>{
-        const id=sel.dataset.id;const v=e.target.value;upd(id,{status:v});
+      // events
+      tbody.querySelectorAll('[data-act="status"]').forEach(sel=> sel.onchange = (e)=> updateOrder(sel.dataset.id,{status:e.target.value}) );
+      ['site','notes','price','profit'].forEach(f=>{
+        if(f==='notes'){
+          tbody.querySelectorAll('[data-field="notes"]').forEach(div=> div.addEventListener('blur',()=> updateOrder(div.dataset.id,{notes:div.innerText})) );
+        } else {
+          tbody.querySelectorAll(`[data-field="${f}"]`).forEach(inp=> inp.onchange=(e)=>{
+            const val = f==='price' || f==='profit' ? Number(e.target.value)||0 : e.target.value;
+            updateOrder(inp.dataset.id,{[f]:val});
+          });
+        }
       });
-      tbody.querySelectorAll('[data-field="site"]').forEach(inp=>inp.onchange=(e)=>{upd(inp.dataset.id,{site:e.target.value})});
-      tbody.querySelectorAll('[data-field="notes"]').forEach(div=>{
-        div.addEventListener('blur',()=>{upd(div.dataset.id,{notes:div.innerText})});
-      });
-
-      // master checkbox
-      $('#checkAll').checked=false;
+      tbody.querySelectorAll('[data-act="edit"]').forEach(b=> b.onclick=()=> openEdit(b.dataset.id));
+      tbody.querySelectorAll('[data-act="del"]').forEach(b=> b.onclick=()=> removeOrder(b.dataset.id));
     }
 
-    function add(o){state.orders=[{id:uid(),...o},...state.orders];save();render()}
-    function upd(id,patch){state.orders=state.orders.map(x=>x.id===id?{...x,...patch,updatedAt:now()}:x);save();render()}
-    function del(id){if(confirm('حذف الطلب؟')){state.orders=state.orders.filter(x=>x.id!==id);save();render()}}
-
-    function openNew(){state.editId=null; $('#dlgTitle').textContent='إضافة طلب'; fillForm(defaultOrder()); $('#orderDlg').showModal()}
-    function openEdit(id){state.editId=id; const o=state.orders.find(x=>x.id===id); $('#dlgTitle').textContent='تعديل الطلب'; fillForm(o); $('#orderDlg').showModal()}
-
-    function defaultOrder(){
-      const code='F'+Date.now().toString().slice(-6);
-      return {code,customerName:'',phone:'',city:'تبوك',source:'واتساب',carBrand:'',carModel:'',carYear:'',parts:'',notes:'',site:'',urgency:'normal',status:'new',assignedTo:'',cost:0,price:0,profit:0,createdAt:now(),updatedAt:now()}
-    }
+    // ======= نافذة الطلب =======
+    const dlg=$('#orderDlg');
+    function openNew(){ state.editId=null; $('#dlgTitle').textContent='إضافة طلب'; fillForm(defaultOrder()); dlg.showModal(); }
+    function openEdit(id){ state.editId=id; const o=state.orders.find(x=>x.id===id); $('#dlgTitle').textContent='تعديل الطلب'; fillForm(o); dlg.showModal(); }
 
     function fillForm(o){
-      $('#f_code').value=o.code||'';$('#f_source').value=o.source||'';$('#f_customer').value=o.customerName||'';$('#f_phone').value=o.phone||'';$('#f_city').value=o.city||'';$('#f_site').value=o.site||'';$('#f_brand').value=o.carBrand||'';$('#f_model').value=o.carModel||'';$('#f_year').value=o.carYear||'';$('#f_parts').value=o.parts||'';$('#f_notes').value=o.notes||'';$('#f_assigned').value=o.assignedTo||'';$('#f_cost').value=o.cost||0;$('#f_price').value=o.price||0;
+      $('#f_code').value=o.code||''; $('#f_source').value=o.source||''; $('#f_customer').value=o.customerName||''; $('#f_phone').value=o.phone||''; $('#f_city').value=o.city||''; $('#f_site').value=o.site||''; $('#f_brand').value=o.carBrand||''; $('#f_model').value=o.carModel||''; $('#f_year').value=o.carYear||''; $('#f_parts').value=o.parts||''; $('#f_notes').value=o.notes||''; $('#f_assigned').value=o.assignedTo||''; $('#f_cost').value=o.cost||0; $('#f_price').value=o.price||0;
       // selects
       $('#f_urgency').innerHTML=URGENCY.map(u=>`<option value="${u.key}">${u.label}</option>`).join('');
-      $('#f_status').innerHTML=STATUSES.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
-      $('#f_urgency').value=o.urgency||'normal';$('#f_status').value=o.status||'new';
+      $('#f_status').innerHTML=STATUS.map(s=>`<option value="${s.key}">${s.label}</option>`).join('');
+      $('#f_urgency').value=o.urgency||'normal'; $('#f_status').value=o.status||'new';
     }
 
     function serializeForm(){
-      const cost=Number($('#f_cost').value)||0;const price=Number($('#f_price').value)||0;
-      return {code:$('#f_code').value.trim(),source:$('#f_source').value.trim(),customerName:$('#f_customer').value.trim(),phone:$('#f_phone').value.trim(),city:$('#f_city').value.trim(),site:$('#f_site').value.trim(),carBrand:$('#f_brand').value.trim(),carModel:$('#f_model').value.trim(),carYear:$('#f_year').value.trim(),parts:$('#f_parts').value.trim(),notes:$('#f_notes').value.trim(),urgency:$('#f_urgency').value,status:$('#f_status').value,assignedTo:$('#f_assigned').value.trim(),cost,price,profit:price-cost,updatedAt:now(),createdAt: state.editId? state.orders.find(x=>x.id===state.editId).createdAt: now()};
+      const cost=Number($('#f_cost').value)||0; const price=Number($('#f_price').value)||0;
+      const base = { code:$('#f_code').value.trim(), source:$('#f_source').value.trim(), customerName:$('#f_customer').value.trim(), phone:$('#f_phone').value.trim(), city:$('#f_city').value.trim(), site:$('#f_site').value.trim(), carBrand:$('#f_brand').value.trim(), carModel:$('#f_model').value.trim(), carYear:$('#f_year').value.trim(), parts:$('#f_parts').value.trim(), notes:$('#f_notes').value.trim(), urgency:$('#f_urgency').value, status:$('#f_status').value, assignedTo:$('#f_assigned').value.trim(), cost, price, profit:price-cost };
+      return base;
     }
 
-    // Events
+    $('#saveBtn').addEventListener('click',(e)=>{
+      e.preventDefault(); const data=serializeForm(); if(state.editId){ updateOrder(state.editId,data); } else { const o=defaultOrder(); addOrder({...o, ...data}); } dlg.close();
+    });
+
+    // ======= أزرار عامة =======
     $('#addBtn').onclick=openNew;
-    $('#quickAdd').onclick=()=>{const o=defaultOrder();o.customerName='بدون اسم'; add(o)}
-    $('#clearFilters').onclick=()=>{$('#q').value='';$('#statusFilter').value='all';$('#urgencyFilter').value='all';render()}
+    $('#quickAdd').onclick=()=>{const o=defaultOrder(); o.customerName='بدون اسم'; addOrder(o)}
+    $('#clearFilters').onclick=()=>{ qInput.value=''; statusFilter.value='all'; urgencyFilter.value='all'; render() };
 
-    $('#orderForm').addEventListener('close',()=>{})
-    $('#saveBtn').onclick=(e)=>{e.preventDefault();const data=serializeForm(); if(state.editId){upd(state.editId,data)} else {add(data)}; $('#orderDlg').close()}
-
-    // search / filters reactive
-    $('#q').oninput=render; $('#statusFilter').onchange=render; $('#urgencyFilter').onchange=render;
-
-    // Bulk delete
-    $('#bulkDeleteBtn').onclick=()=>{
-      const ids=[...$$('.rowCheck:checked')].map(x=>x.dataset.id);
-      if(ids.length===0) return alert('اختر صفوفًا أولاً');
-      if(confirm('هل تريد حذف العناصر المحددة؟')){state.orders=state.orders.filter(o=>!ids.includes(o.id));save();render()}
-    }
-    $('#checkAll').onchange=(e)=>{$$('.rowCheck').forEach(c=>c.checked=e.target.checked)}
-
-    // Export CSV
+    // Export/Import
     $('#exportCsvBtn').onclick=()=>{
       const headers=["id","code","customerName","phone","city","source","site","carBrand","carModel","carYear","parts","notes","urgency","status","assignedTo","cost","price","profit","createdAt","updatedAt"];
-      const rows=state.orders.map(o=>headers.map(h=> (o[h]??'').toString().replace(/\"/g,'""') ));
-      const csv=[headers.join(','),...rows.map(r=>r.map(x=>`"${x}"`).join(','))].join('\n');
-      const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='orders.csv';a.click();
-    }
+      const rows=state.orders.map(o=> headers.map(h=> (o[h]??'').toString().replace(/"/g,'""')) );
+      const csv=[headers.join(','), ...rows.map(r=> r.map(x=>`"${x}"`).join(','))].join('\n');
+      const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='orders.csv'; a.click();
+    };
+    $('#backupBtn').onclick=()=>{ const a=document.createElement('a'); a.href='data:application/json,'+encodeURIComponent(JSON.stringify(state.orders,null,2)); a.download='orders-backup.json'; a.click(); };
+    $('#importBtn').onclick=()=> $('#fileInput').click();
+    $('#fileInput').onchange=(e)=>{ const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); if(Array.isArray(data)){ state.orders=data; saveOrders(); render(); } else alert('ملف غير صالح'); }catch(err){ alert('فشل قراءة الملف'); } }; r.readAsText(f) };
 
-    // Backup / Import JSON
-    $('#backupBtn').onclick=()=>{const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify(state.orders,null,2));a.download='orders-backup.json';a.click()}
-    $('#importBtn').onclick=()=>$('#fileInput').click();
-    $('#fileInput').onchange=(e)=>{const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{try{const data=JSON.parse(r.result); if(Array.isArray(data)){state.orders=data; save(); render()} else alert('ملف غير صالح');}catch(err){alert('فشل قراءة الملف')}}; r.readAsText(f)}
-
-    renderFilters(); render();
+    // ======= تشغيل =======
+    fillFilters(); ensurePassword(); render();
   </script>
 </body>
 </html>
